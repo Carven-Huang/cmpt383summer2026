@@ -138,7 +138,7 @@ long to run.
 
 If $A$ and $B$ are two sets, then their **Cartesian product $A \times B$** is
 the set of all pairs $(a, b)$ where $a \in A$ and $b \in B$, i.e. $A \times B =
-(a, b) : a \in A, b \in B$. In Python:
+\{ (a, b) : a \in A, b \in B \}$. In Python:
 
 ```python
 >>> [(a, b) for a in A 
