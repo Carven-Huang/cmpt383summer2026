@@ -151,8 +151,8 @@ comprehension makes $n^2$ elements, which is a quadratic run time.
 
 Generalizing this, the Cartesian product of the sets $A_1, A_2, \ldots, A_n$ is
 the set of all $n$-tuples $(a_1, a_2, \ldots, a_n)$ where $a_i \in A_i$ for $i =
-1, 2, \ldots, n$, i.e. $A_1 \times A_2 \times \cdots \times A_n = (a_1, a_2,
-\ldots, a_n) : a_i \in A_i$ for $i = 1, 2, \ldots, n$. 
+1, 2, \ldots, n$, i.e. $A_1 \times A_2 \times \cdots \times A_n = \\{ (a_1, a_2,
+\ldots, a_n) : a_i \in A_i \\}$ for $i = 1, 2, \ldots, n$. 
 
 In Python:
 
