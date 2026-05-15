@@ -532,8 +532,9 @@ value and returns it. We can use it like this:
 
 ```python
 counter = Counter()
-print(counter.next())
-print(counter.next())
+print(counter.next()) # 1
+print(counter.next()) # 2
+print(counter.next()) # 3
 ```
 
 Here's an iterator that iterates over the letters of a given string `s`:
@@ -562,8 +563,8 @@ print(letters.next()) # crashes!
 `Letters` is useful as long as there are more letters to iterate over. But when
 all the letters have returned, it crashes. And crashing is never a good thing! 
 
-Note that `Counter` doesn't crash because it has no end. It is an example of an
-**endless iterator**, or an **infinite iterator**.
+Note that `Counter` *doesn't* crash: it has no end. `Counter` is an example of
+an **endless iterator**, or an **infinite iterator**.
 
 To deal with iterators that are done (i.e. they have no more elements to
 return), Python uses the `StopIteration` exception. The idea is that if next is
@@ -605,11 +606,12 @@ it must have these two methods:
 - `__next__()` returns the next value from the iterator, raises `StopIteration`
 if there are no more values. Python calls it `__next__` instead of `next`
 since it is a Python convention to use double underscores for special methods.
+
 - `__iter__()` returns the iterator object itself. This usually just returns
 `self`, i.e. the object itself. But container objects, such as a list, have
 `__iter__` so that you can get an iterator object for the container.
 
-The idea is that calling `__iter_()` gets you an iterator object that is
+The idea is that calling `__iter__()` gets you an iterator object that is
 guaranteed to have a `__next__` method. 
 
 So lets update `Letters` to make it an official Python iterator:
@@ -635,9 +637,9 @@ We can still use this as before, using the  `__next__` method:
 
 ```python
 letters = Letters("cat")
-print(letters.__next__())
-print(letters.__next__())
-print(letters.__next__())
+print(letters.__next__()) # 'c'
+print(letters.__next__()) # 'a'
+print(letters.__next__()) # 't'
 print(letters.__next__()) # StopIteration exception
 ```
 
@@ -645,9 +647,9 @@ But now we can also use the `next` function, which is a little more readable:
 
 ```python
 letters = Letters("cat")
-print(next(letters))
-print(next(letters))
-print(next(letters))
+print(next(letters)) # 'c'
+print(next(letters)) # 'a'
+print(next(letters)) # 't'
 print(next(letters)) # StopIteration exception
 ```
 
@@ -674,8 +676,8 @@ Python already provides an iterator like `Letters` for strings. We can iterate
 directly over strings like this:
 
 ```python
-for letter in "cat":
-    print(letter)
+for c in "cat":
+    print(c)
 ```
 
 This works because Python strings implement the `__iter__` method, which returns
@@ -692,8 +694,8 @@ for c in it:
 But as we've seen, we can just write this:
 
 ```python
-for letter in "cat":
-    print(letter)
+for c in "cat":
+    print(c)
 ```
 
 This shows us something important: `for` works with an object that has
@@ -701,8 +703,8 @@ This shows us something important: `for` works with an object that has
 object, and then calls `__next__` on that iterator object to get the next
 values.
 
-In Python terminology, we say that strings are **iterable** (but *not*
-iterators). In general, any object that has a `__iter__` method is iterable. An
+In Python terminology, we say that strings are **iterable** (but they are *not*
+iterators). In general, any object that has an `__iter__` method is iterable. An
 iterator is any object that is both iterable (has an `__iter__` method) *and*
 has a `__next__` method.
 
