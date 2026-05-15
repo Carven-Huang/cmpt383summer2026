@@ -216,10 +216,32 @@ vice versa).
 
 ### The walrus operator
 
-Suppose you want to get a list of scores for all the names in a list, and
-calling the `get_score` function is relatively expensive (e.g. maybe it has to
-read from a file or database each time it is called). This code works, but is
-inefficient:
+Consider this function:
+
+```python
+def get_score(s): 
+    return sum(ord(c) for c in s)
+```
+
+It returns the sum of the [ASCII values](https://en.wikipedia.org/wiki/ASCII) of
+the characters in the string, e.g. `get_score('cat')` returns 312. A function
+like this might be useful with hash table of string.
+
+Now consider this code, which gets list of all the names and scores that match a
+certain condition:
+
+```python
+all_names = ['Bob', 'Alice', 'Charlie', 'Bev']
+
+high_scores = [(n, get_score(n))
+               for n in all_names 
+               if get_score(n) % 5 != 0
+              ]
+```
+
+For each name, `get_score` is called *twice*, and it returns that same result
+each time. That's inefficient. We can do better by using the **walrus
+operator**, `:=`, to save the value of the result in a variable:
 
 ```python
 # works, but inefficient!
@@ -232,19 +254,10 @@ re-wrote this without list comprehensions we could save the result in a
 variable:
 
 ```python
-high_scores = []
-for name in all_names:
-    score = get_score(name) # get_score only called once
-    if score is not None and score > 90:
-        high_scores.append(score)
-```
-
-We can do the same thing in a list comprehension with the **walrus operator**,
-`:=`, like this:
-
-```python
-high_scores = [score for name in all_names if (score := get_score(name)) is not None
-                                           if score > 90]
+high_scores = [(n, score)
+               for n in all_names 
+               if (score := get_score(n)) % 5 != 0  # walrus operator used here
+              ]
 ```
 
 The first time `get_score` is called its result is saved in the variable `score`
@@ -254,7 +267,7 @@ needing to call `get_score` again.
 In some situations the walrus operator can make code more concise and efficient,
 so be on the lookout for situations where it can be used.
 
-(See [high_scores.py](high_scores.py) for a code example.)
+See [high_scores.py](high_scores.py) for a code example.
 
 ### Using zip
 
@@ -409,6 +422,43 @@ lists). `zip([1, 2], [3, 4], [5, 6])` yields these values:
 (1, 3, 5) holds the firsts elements of each list, and (2, 4, 6) holds the  
 second elements. After converting the tuples to lists, you get the transpose of  
 the matrix!
+
+#### The Unpacking Operator
+
+As another example of unpacking as shown above, consider this function which
+takes three arguments:
+
+```python
+def f(a, b, c):
+    return a + b + c
+```
+
+We can call it like this:
+
+```python
+print(f(1, 2, 3)) # 6
+```
+
+But suppose we have list of values:
+
+```python
+values = [1, 2, 3]
+print(f(values)) # error: wrong number of arguments
+```
+
+`f` takes three arguments, the expression `f(values)` only passed one argument.
+We could fix it like this:
+
+```python
+print(f(values[0], values[1], values[2])) # 6
+```
+
+That works, but it's a pain to write. The unpacking operator `*` lets us do the
+same thing more concisely:
+
+```python
+print(f(*values)) # 6
+```
 
 ## Generators and co-routines
 
