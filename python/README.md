@@ -1453,6 +1453,18 @@ class Timer:
         return False  # False = don't suppress any exception; re-raise if one occurred
 ```
 
+The parameters to `__exit__` are used for handling exceptions that might occur
+in the block of code:
+
+- `exc_type`: the type of the exception that occurred, or `None` if no exception
+  occurred
+
+- `exc_val`: the value of the exception that occurred, or `None` if no exception
+  occurred
+
+- `exc_tb`: the traceback of the exception that occurred, or `None` if no
+  exception occurred
+
 ## The Match Statement
 
 The `match` statement is a new feature in Python 3.10. It is a more powerful
