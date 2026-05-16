@@ -59,8 +59,8 @@ For example, the dot product of `[1, 2, 3]` and `[4, 5, 6]` is `1*4 + 2*5 + 3*6 
 
 ## Question 6
 
-Given a list of strings, use a loop (or a list comprehension) and ```enumerate`
-to print each string on its own line, numbered starting from 1. 
+Given a list of strings, use a loop (or a list comprehension) and `enumerate` to
+print each string on its own line, numbered starting from 1. 
 
 For example, if the list is `['apple', 'banana', 'cherry']`, the output should
 be:
