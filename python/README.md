@@ -379,50 +379,6 @@ expression generating the list are `True`, and `False` otherwise.
 This is not the most efficient way to write the `is_sorted` function, but it's
 short enough to fit on one line.
 
-#### Transposing a Matrix
-
-Finally, consider **transposing** a matrix (a fundamental operation in linear
-algebra). For example if you have the matrix:
-
-```
-1 2
-3 4
-5 6
-```
-
-It's transpose is:
-
-```
-1 3 5
-2 4 6
-```
-
-Transposing swap the rows and columns.
-
-Using `zip` and the `*` operator we can transpose a matrix like this:
-
-```python
-matrix = [[1, 2], [3, 4], [5, 6]]
-transposed = [list(row) for row in zip(*matrix)]
-```
-
-The expression `zip(*matrix)` is, in this example, the same as `zip([1, 2], [3, 4], [5, 6])`. 
-The `*` operator *unpacks* the elements of `matrix` into its individual lists
-and passes them to `zip` as separate arguments (`zip` can take any number of
-lists). `zip([1, 2], [3, 4], [5, 6])` yields these values:
-
-```python
->>> for row in zip([1, 2], [3, 4], [5, 6]):
-...     print(row)
-...
-(1, 3, 5)
-(2, 4, 6)
-```
-
-(1, 3, 5) holds the firsts elements of each list, and (2, 4, 6) holds the  
-second elements. After converting the tuples to lists, you get the transpose of  
-the matrix!
-
 #### The Unpacking Operator
 
 As another example of unpacking as shown above, consider this function which
@@ -460,7 +416,68 @@ same thing more concisely:
 print(f(*values)) # 6
 ```
 
-## Generators and co-routines
+#### Transposing a Matrix
+
+Finally, consider **transposing** a matrix (a fundamental operation in linear
+algebra). For example if you have the matrix:
+
+```
+1 2
+3 4
+5 6
+```
+
+It's transpose is:
+
+```
+1 3 5
+2 4 6
+```
+
+Transposing swaps the rows and columns.
+
+In Python the first matrix would be:
+
+```python
+[[1, 2],  # row 0
+ [3, 4],  # row 1
+ [5, 6]]  # row 2
+```
+
+And the transpose would be:
+
+```python
+[[1, 3, 5],  # column 0
+ [2, 4, 6]]  # column 1
+```
+
+Can you how `zip` and the `*` unpacking operator to transpose the matrix?
+
+Using `zip` and the `*` operator we can transpose a matrix like this:
+
+```python
+matrix = [[1, 2], [3, 4], [5, 6]]
+transposed = [list(row) for row in zip(*matrix)]
+```
+
+The expression `zip(*matrix)` is, in this example, the same as `zip([1, 2], [3, 4], [5, 6])`. 
+The `*` operator *unpacks* the elements of `matrix` into its individual lists
+and passes them to `zip` as separate arguments (`zip` can take any number of
+lists). `zip([1, 2], [3, 4], [5, 6])` yields these values:
+
+```python
+>>> for row in zip([1, 2], [3, 4], [5, 6]):
+...     print(row)
+...
+(1, 3, 5)
+(2, 4, 6)
+```
+
+`(1, 3, 5)` holds the firsts elements of each list, and `(2, 4, 6)` holds the
+second elements. After converting the tuples to lists, you get the transpose of
+the matrix!
+
+## Generators and Co-routines
 
 ### Enumerate
 
