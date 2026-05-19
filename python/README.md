@@ -477,6 +477,8 @@ lists). `zip([1, 2], [3, 4], [5, 6])` yields these values:
 second elements. After converting the tuples to lists, you get the transpose of
 the matrix!
 
+See [zip_demo_sol.py](zip_demo_sol.py) for a more code.
+
 ## Generators and Co-routines
 
 ### Enumerate
