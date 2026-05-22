@@ -32,7 +32,7 @@ Write list comprehensions to do the following:
   first list, `b` is from the second list, `c` is from the third list, and `a`,
   `b`, and `c` are all different.
 
-- Make list of all integer solutions to the equation `a^2 + b^2 = c^2`. Assume
+- Make a list of all integer solutions to the equation `a^2 + b^2 = c^2`. Assume
   `a`, `b`, and `c` are all integers between 1 and 100, and `a < b < c`. Write
   each solution as a tuple `(a, b, c)`. The list starts and ends with: `[(3, 4,
   5), (5, 12, 13), (6, 8, 10), ..., (60, 80, 100), (65, 72, 97)]`.
@@ -43,9 +43,9 @@ In Python, what is the **walrus operator**? What is used for? Give an example.
 
 ## Question 4
 
-Using the `zip` function, write a function called `add_lists(A, B)` that uses
-the `zip` function to add two lists of numbers element-wise. Assume the lists
-are non-empty, only contain numbers, and have the same length.
+Using the `zip` function, write a function called `add_lists(A, B)` that that
+adds two lists of numbers element-wise. Assume the lists are non-empty, only
+contain numbers, and have the same length.
 
 For example, `add_lists([1, 2, 3], [4, 5, 6])` should return `[5, 7, 9]`.
 
@@ -107,7 +107,7 @@ c
 
 ## Question 10
 
-Explain to another a programmer what it means to that Python strings are
+Explain to another a programmer what it means to say that Python strings are
 **iterable** but not **iterators**.
 
 ## Question 11
