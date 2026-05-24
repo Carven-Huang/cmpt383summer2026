@@ -238,7 +238,7 @@ of how to use one.
 Write a Python decorator called `always_return_str` that makes a sure a function
 always returns by calling `str` on the result.
 
-For example (`isinstance(x, str)` returns `True` if `x` is a string, and `False`
+For example `isinstance(x, str)` returns `True` if `x` is a string, and `False`
 otherwise) :
 
 ```python
