@@ -1144,7 +1144,6 @@ inside another function to give it some extra behavior. For example, suppose we
 have this function to simulate doing laundry:
 
 ```python
-
 def do_laundry():
     import time
     print("Doing laundry ... ")
