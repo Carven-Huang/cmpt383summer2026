@@ -20,8 +20,8 @@ def make_timed_function(f):
         return result
     return timed_function
 
-@make_hello_goodbye
-# @make_timed_function
+@make_timed_function
+# @make_hello_goodbye
 def do_laundry():
     import time
     print("Doing laundry ... ")

@@ -21,12 +21,12 @@ def do_laundry(who, duration=1):
 
 do_laundry("Elon", 1.2)
 
-# @make_timed_function
-# def factorial(n):
-#     result = 1
-#     for i in range(1, n + 1):
-#         result *= i
-#     return result
+@make_timed_function
+def factorial(n):
+    result = 1
+    for i in range(1, n + 1):
+        result *= i
+    return result
 
-# print(factorial(40))
+print(factorial(40))
 

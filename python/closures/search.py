@@ -21,6 +21,7 @@ def find(lst, match_fn):
 def is_four(s):
     return len(s) == 4
 
+# Returns True if s has two consecutive letters that are the same.
 def has_repeat(s):
     n = len(s)
     if n < 2:

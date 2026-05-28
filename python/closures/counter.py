@@ -7,8 +7,9 @@
 def make_counter():
     n = 0
     def counter():
-        nonlocal n
+        # nonlocal n
         n += 1
+        # print(n)
         return n
     return counter
 
