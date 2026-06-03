@@ -758,5 +758,6 @@ def deco3(f):
 @deco3
 def hello():
     print("hello")
+    
 hello()
 
