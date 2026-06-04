@@ -100,6 +100,7 @@ a feel for the language.
 - [if_statements.go](examples/if_statements/main.go)
 - [switch_statements.go](examples/switch_statements/main.go)
 - [primes.go](examples/primes/main.go)
+  - [primes_test.go](examples/primes/primes_test.go)
 - [defer.go](examples/defer/main.go)
 
 ### Lecture 3, 4: Arrays, Slices, and Maps
