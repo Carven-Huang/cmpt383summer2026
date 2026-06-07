@@ -1,4 +1,4 @@
-// functionsAndClosures.go
+// question3c_and_more.go
 
 //
 // This demonstrates the use of closures in Go. A closure is function plus an
@@ -13,8 +13,8 @@ package main
 import "fmt"
 
 func main() {
-	// test_makeAdder()
-	test_makeIncrementer()
+	test_makeAdder()
+	// test_makeIncrementer()
 }
 
 //
@@ -31,24 +31,10 @@ func makeAdder(n int) func(int) int {
 func test_makeAdder() {
 	add5 := makeAdder(5)
 	n := 1
-	fmt.Printf("n=%v\n", n)
-	fmt.Printf("n=%v\n", add5(n))
+	fmt.Println("n is:", n)
+	fmt.Printf("add5(%v) returns: %v\n", n, add5(n))
+	fmt.Printf("add5(add5(%v)) returns: %v\n", n, add5(add5(n)))
 }
-
-//
-// An incrementer is a value that supports these two operations after it is
-// created:
-//
-// - Add 1 (increment). - Return the current value
-//
-// makeIncrementer returns two closures, once for each of these operations. Both
-// closes share the same variable n, and:
-//
-// - inc, the incrementer, takes no input and returns nothing; all you do is
-//   call it and it adds 1 to n.
-//
-// - get, the getter, takes no input and returns the current value of n.
-//
 
 //
 // This returns two closures (functions with an associated environment of
@@ -64,7 +50,7 @@ func test_makeAdder() {
 // type is func() int, i.e. a function that takes no input and returns an int.
 //
 func makeIncrementer() (func(), func() int) {
-	// n is the value to be incremented
+	// n is the shared value to be incremented
 	n := 0
 	inc := func() {
 		n++
@@ -85,15 +71,3 @@ func test_makeIncrementer() {
 	inc_a()
 	fmt.Println("a has the value:", get_a())
 }
-
-// func test_makeIncrementer() {
-// 	inc_a, get_a := makeIncrementer()
-// 	inc_b, get_b := makeIncrementer()
-// 	for i := 1; i <= 5; i++ {
-// 		inc_a() // a is incremented once
-// 		inc_b() // b is incremented twice
-// 		inc_b()
-// 	}
-// 	fmt.Printf("get_a(): %v\n", get_a())
-// 	fmt.Printf("get_b(): %v\n", get_b())
-// }
