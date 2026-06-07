@@ -5,7 +5,6 @@
 // generate prime numbers.
 //
 
-
 package main
 
 import "fmt"
@@ -15,7 +14,7 @@ func main() {
         fmt.Println(i, IsPrime(i))
     }
 
-    fmt.Println(PrimesLessThan(10000)) // correct answer: 1229
+    fmt.Println(PrimesLessThan(10000))  // 1229
 }
 
 // Returns true if the integer n is prime, and false otherwise.

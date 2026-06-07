@@ -10,13 +10,11 @@
 
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 func main() {
-	test_makeAdder()
-	// test_makeIncrementer()
+	// test_makeAdder()
+	test_makeIncrementer()
 }
 
 //
@@ -51,6 +49,20 @@ func test_makeAdder() {
 //
 // - get, the getter, takes no input and returns the current value of n.
 //
+
+//
+// This returns two closures (functions with an associated environment of
+// variables). 
+//
+// The first closure is an increment function that adds 1 to the variable n.
+// Notice in the function header that the return type is fun(), i.e. a function
+// that takes no input and returns nothing.
+//
+// The second closure is a getter function that returns the current value of n.
+// Both closures share the same variable n, so it they act like an object with
+// two methods: increment and get. Notice in the function header that the return
+// type is func() int, i.e. a function that takes no input and returns an int.
+//
 func makeIncrementer() (func(), func() int) {
 	// n is the value to be incremented
 	n := 0
@@ -65,12 +77,23 @@ func makeIncrementer() (func(), func() int) {
 
 func test_makeIncrementer() {
 	inc_a, get_a := makeIncrementer()
-	inc_b, get_b := makeIncrementer()
-	for i := 1; i <= 5; i++ {
-		inc_a() // a is incremented once
-		inc_b() // b is incremented twice
-		inc_b()
-	}
-	fmt.Printf("get_a(): %v\n", get_a())
-	fmt.Printf("get_b(): %v\n", get_b())
+	fmt.Println("a has the value:", get_a())
+	inc_a()
+	fmt.Println("a has the value:", get_a())
+	inc_a()
+	inc_a()
+	inc_a()
+	fmt.Println("a has the value:", get_a())
 }
+
+// func test_makeIncrementer() {
+// 	inc_a, get_a := makeIncrementer()
+// 	inc_b, get_b := makeIncrementer()
+// 	for i := 1; i <= 5; i++ {
+// 		inc_a() // a is incremented once
+// 		inc_b() // b is incremented twice
+// 		inc_b()
+// 	}
+// 	fmt.Printf("get_a(): %v\n", get_a())
+// 	fmt.Printf("get_b(): %v\n", get_b())
+// }

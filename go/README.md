@@ -1,5 +1,9 @@
 ## Go
 
+## Go Problem Set
+
+[Go problem set](Go_problemset.md)
+
 ## Reading
 
 For general help about Go, check out the [Go tutorial getting started
@@ -99,9 +103,9 @@ a feel for the language.
 - [functions.go](examples/functions/main.go)
 - [if_statements.go](examples/if_statements/main.go)
 - [switch_statements.go](examples/switch_statements/main.go)
+- [defer.go](examples/defer/main.go)
 - [primes.go](examples/primes/main.go)
   - [primes_test.go](examples/primes/primes_test.go)
-- [defer.go](examples/defer/main.go)
 
 ### Lecture 3, 4: Arrays, Slices, and Maps
 
@@ -122,10 +126,17 @@ slice is copied but the underlying array is not copied. It is possible to have
 two, or more, slices that point to the same underlying array, and it is up to
 the programmer to keep track of this.
 
+Slice examples:
+- [question5.go](examples/question5/main.go) 
+  - one solution to Question 5 of [the Go problem set](Go_problemset.md)
 - [slices.go](examples/slices/main.go)
 - [bits.go](examples/bits/main.go)
 - [sort.go](examples/sort/main.go)
+
+Map example:
 - [wordcount.go](examples/wordcount/main.go)
+
+Function and closure examples:
 - [functionsAndClosures.go](examples/functionsAndClosures/main.go)
 - [compose.go](examples/compose/main.go)
 
