@@ -23,7 +23,7 @@ import "fmt"
 // global indent string constant
 const indent = "   "
 
-// print a message, a :, and a newline
+// print a message on its own line
 func example(msg string) {
 	fmt.Printf("\n%v:\n", msg)
 }

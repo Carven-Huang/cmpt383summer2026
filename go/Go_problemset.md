@@ -111,7 +111,7 @@ give clear descriptions of what each function does:
 - `clear(s)` (sets the elements of slice `s` to the zero value; length remains
   unchanged)
 
-## Question 6
+## Question 6 (Optional)
 
 Write a function called `countAll(words []string)` that takes a non-empty slice
 of strings as input, and returns a map of the counts of all the words in the

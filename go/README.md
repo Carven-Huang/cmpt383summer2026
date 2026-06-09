@@ -127,13 +127,16 @@ two, or more, slices that point to the same underlying array, and it is up to
 the programmer to keep track of this.
 
 Slice examples:
-- [question5/main.go](examples/question5/main.go) 
+- [question5/main.go](examples/question5/main.go)
   - one solution to Question 5 of [the Go problem set](Go_problemset.md)
+- [splitter/main.go](examples/splitter/main.go)
+  - a simple example of a tokenizer that splits a string into words
 - [slices/main.go](examples/slices/main.go)
 - [bits/main.go](examples/bits/main.go)
+  - generating bit strings
 - [sort/main.go](examples/sort/main.go)
 
-Map example:
+Map example (optional):
 - [wordcount/main.go](examples/wordcount/main.go)
 
 Function and closure examples:
