@@ -10,6 +10,7 @@ type Point struct {
 	x, y float64
 }
 
+//
 // This is a method. The parameter before the name is the method's receiver,
 // i.e. p is the receiver of the String method. 
 //
