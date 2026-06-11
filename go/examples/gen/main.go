@@ -52,7 +52,8 @@ func TestFib() {
 	// every time <-nextFib is called, the next Fibonacci number is taken from
 	// the channel
 	nextFib := fibgen()
-	for i := 0; i < 10; i++ {
+	// for i := 0; i < 10; i++ {
+	for range 10 {
 		fmt.Println(<-nextFib)
 	}
 }

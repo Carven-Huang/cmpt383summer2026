@@ -155,7 +155,7 @@ More examples are in these notes [interfaceDemo.md](interfaceDemo.md) and the
 associated code in [interface_Counter/main.go](examples/interface_Counter/main.go)
 
 
-### Lecture 7: Generics and Concurrency (if time permits)
+### Lecture 7: Generics and Concurrency
 
 Generics are a way to write code that can work with any type.
 
