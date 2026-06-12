@@ -89,8 +89,8 @@ type UndoableCounter struct {
 }
 
 func (uc *UndoableCounter) incr(n int) {
-	uc.count += n
 	uc.prevCount = uc.count
+	uc.count += n
 }
 
 func (uc *UndoableCounter) getCount() int {

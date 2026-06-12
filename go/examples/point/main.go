@@ -47,6 +47,8 @@ func (p Point) String() string {
 
 func main() {
 	p := Point{4.5, -0.44}
-	q := Point{10, 100}
-	fmt.Printf("p = %v, q = %v\n", p, q)
+	fmt.Println(String(p))  // p.String()
+	// q := Point{10, 100}
+	// fmt.Println(p, q)
+	// fmt.Printf("p = %v, q = %v\n", p, q)
 }
