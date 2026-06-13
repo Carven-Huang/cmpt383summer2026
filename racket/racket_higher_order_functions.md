@@ -14,6 +14,7 @@ The usual way of evaluating function calls in [Racket] is like this:
 6
 > (cons 'cherry '(ice cream))
 '(cherry ice cream)
+
 > (map even? '(2 3 4 5))
 '(#t #f #t #f)
 ```
@@ -23,9 +24,11 @@ An alternative way is to use `apply`:
 ```lisp
 > (apply * '(1 2 3))
 6
+
 > (apply cons '(cherry (ice cream)))
 '(cherry ice cream)
-> (apply map `(,even? (2 3 4 5)))  ;; quasiquoting
+
+> (apply map (list even? '(2 3 4 5)))
 '(#t #f #t #f)
 ```
 
@@ -33,9 +36,8 @@ An alternative way is to use `apply`:
 in `list-of-args` as its input. It's as if `f` is cons-ed onto `args`, and then
 that expression is evaluated.
 
-Notice in the example using `map` that quasiquoting is used to ensure that
-`even?` refers to the function `even?`, and *not* the symbol `'even?`. Quoting
-the entire list would cause an error:
+Notice in the example using `map`, `list` was used. A quoted list won't work
+here because it treats `even?` as a symbol instead of a function:
 
 ```lisp
 > (apply map '(even? (2 3 4 5)))
@@ -44,38 +46,6 @@ the entire list would cause an error:
 ;   given: 'even?
 ;   argument position: 1st
 ; [,bt for context]
-```
-
-The problem here is that `even?` is treated as a symbol, and so that causes an
-error when it's passed to `map` (which is expecting a function).
-
-Here's another example of `apply` taken from a unit testing framework:
-
-```lisp
-;; f is the function you want to test
-;; test-pair has the form ((args) expected-result)
-(define (check-one-case f test-pair)
-  (let* ([input (first test-pair)]
-         [expected (second test-pair)]
-         [actual (apply f input)])  ;; apply is used here!
-    (if (equal? actual expected)
-        (append `(passed ,actual) test-pair)
-        (append `(failed ,actual) test-pair))))
-```
-
-This particular testing framework separates the function being tested from it's
-input, e.g.:
-
-```lisp
-(define (abs-diff-bad x y)
-  (- x y))
-
-(define suite-abs-diff  ;; [input expected-output] pairs
-  '([(2 3) 1]
-    [(3 2) 1]
-    [(5 5) 0]
-    [(7 9) 2]
-    [(10 4) 6]))
 ```
 
 ## eval
@@ -269,7 +239,7 @@ how to handle free variables. Closures are a common solution to this problem.
 Another is to simply disallow returning functions with free variables, but this
 reduces the flexibility of returning functions.
 
-In [Go], a language which supports closures, you can do this:
+In [Go], a language that supports closures, you can do this:
 
 ```go
 package main
@@ -325,12 +295,17 @@ can contain both functions and variables, as in this example:
 
 > (show-count)
 0
+
 > (add 2)
+
 > (show-count)
 2
+
 > (show-name)
 "num frogs"
+
 > (set-name "frog count")
+
 > (show-name)
 "frog count"
 ```
@@ -436,13 +411,13 @@ of `n`", where function composition is used instead of multiplication.
 
 ## Composing Multiple Functions
 
-[Racket]'s built-in `compose` function allows to compose 2 or more functions
-together. It's instructive to implement our own version of this, so lets write
-a function called `(compose-all f1 f2 ... fn)` that returns the composition of
-`f1` to `fn`, i.e. `(f1 (f2 ... (fn x)))`.
+[Racket]'s built-in `compose` function lets you tcompose 2 or more functions.
+It's instructive to implement our own version of this, so lets write a function
+called `(compose-all f1 f2 ... fn)` that returns the composition of `f1` to
+`fn`, i.e. `(f1 (f2 ... (fn x)))`.
 
-A neat little feature of `compose-all` is that the functions are *not* passed on
-a list. Instead writing `(compose-all (list f1 f2 ... fn))`, we write
+A neat feature of `compose-all` is that the functions are *not* passed on a
+list. Instead writing `(compose-all (list f1 f2 ... fn))`, we write
 `(compose-all f1 f2 ... fn)`. Using this trick require a special form of
 `define`:
 
@@ -462,10 +437,13 @@ Here's a complete implementation of `compose-all`s:
 ;; (compose-all f1 f2 ... fn) 
 ;; returns (f1 (f2 ... (fn x) ...))
 (define (compose-all . fns)
-  (cond [(empty? fns) (error "compose-all: empty args")]
-        [(empty? (rest fns)) (first fns)]
-        [else (comp (first fns) 
-                    (apply compose-all (rest fns)))]))
+  (cond [(empty? fns) 
+           (error "compose-all: empty args")]
+        [(empty? (rest fns)) 
+           (first fns)]
+        [else 
+           (comp (first fns) 
+                 (apply compose-all (rest fns)))]))
 ```
 
 Calling `(compose-all)` without any arguments is considered an error, and
@@ -551,11 +529,11 @@ Here are two different ways to write the addition function:
 ```
 
 `add_a` takes two inputs, and immediately returns an answer. `add_b` takes only
-one input and returns a function. This function takes the second input and
-returns the answer.
+one input and returns a function. This returned function takes the second input
+and returns the sum of the two inputs.
 
-The nice thing about `add_b` is that if we give it only a single input `n`, the
-we get a function that might actually be useful:
+The nice thing about `add_b` is that if we give it only a single input `n`, 
+we get a function that can be useful:
 
 ```lisp
 (define add5 (add_b 5))
@@ -713,6 +691,7 @@ you can create an infinite loop just from calling lambda functions.
 
 
 ### The K Combinator
+
 The function `(K x)` returns a function that takes a single input `y`, and for
 any value of `y` returns `x`. In other words, it returns a *constant* function
 that always returns `x`:
@@ -722,6 +701,7 @@ that always returns `x`:
 ```
 
 ### The S Combinator
+
 Function `S3` takes 3 inputs:
 
 ```lisp

@@ -1,8 +1,14 @@
-# Propositional Logic Examples
+# Symbolic Programming in Racket
 
-Lets write some functions that process **literal boolean propositional
-expressions** like `(t and (not f))` and `((f or f) and ((not t) and f))`. The
-symbols `t` and `f` stand for *true* and *false* respectively, and, at least to
+One of the original uses of [LISP] was for **symbolic programming**, i.e.
+programming with symbols and expressions. Still today it is a good tool for such
+problems, so lets look at some example.
+
+## Propositional Logic Examples
+
+Lets write some functions that process a language of **literal boolean
+propositional expressions** like `(t and (not f))` and `((f or f) and ((not t)
+and f))`. The symbols `t` and `f` stand for *true* and *false*, and, at least to
 start, we will not have any variables. We are *not* using the built-in [Racket]
 boolean values (`#t` and `#f`) since this is our own little language different
 from [Racket].
@@ -53,15 +59,27 @@ valid expressions:
 ```lisp
 (define (is-expr? e)
     (cond
-      [(is-literal? e) #t]
-      [(is-not? e) (is-expr? (second e))]
+      [(is-literal? e) 
+         #t]
+      [(is-not? e) 
+         (is-expr? (second e))]
       [(is-and? e)
-       (and (is-expr? (first e))
-            (is-expr? (third e)))]
+         (and (is-expr? (first e))
+              (is-expr? (third e)))]
       [(is-or? e)
-       (and (is-expr? (first e))
-            (is-expr? (third e)))]
-      [else #f]))
+         (and (is-expr? (first e))
+              (is-expr? (third e)))]
+      [else 
+         #f]))
+
+> (is-expr? '(t and (not f)))
+#t
+
+> (is-expr? '((f or f) and ((not t) and f)))
+#t
+
+> (is-expr? '((f or a) and t))
+#f
 ```
 
 ### Challenge: checking expressions with or
@@ -78,16 +96,17 @@ true or false:
 (define (eval-prop-bool e)
     (cond
       [(is-literal? e)
-       (is-true? e)]
+         (is-true? e)]
       [(is-not? e)
-       (not (eval-prop-bool (second e)))]
+         (not (eval-prop-bool (second e)))]
       [(is-and? e)
-       (and (eval-prop-bool (first e)) 
-            (eval-prop-bool (third e)))]
+         (and (eval-prop-bool (first e)) 
+              (eval-prop-bool (third e)))]
       [(is-or? e)
-       (or (eval-prop-bool (first e)) 
-           (eval-prop-bool (third e)))]
-      [else #f]))
+         (or (eval-prop-bool (first e)) 
+             (eval-prop-bool (third e)))]
+      [else 
+         #f]))
 
 (define (eval-prop e)
    (if (eval-prop-bool e) 't 'f))
@@ -138,12 +157,12 @@ the expressions.
 ## EBNF: Extended Backus-Naur Form
 
 `is-expr?` is a precise definition of what is, and isn't, a valid boolean
-literal expression. It defines the legal expressions in a small language.
+literal expression. It defines the legal expressions of a small language.
 
 A more common way to specify a language is to use [Extended Backus-Naur
 Formalism](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form), or
-[EBNF] for short. [EBNF] is a language designed for precisely defining the
-*syntax* (not semantics!) of programming languages.
+[EBNF] for short. [EBNF] is designed for precisely defining the *syntax* (not
+semantics!) of programming languages.
 
 **Syntax** is the grammatical structure of the language. For example, `(define x
 3)` is a syntactically valid [Racket] expression, but `define x 3)` and `(x is
@@ -364,6 +383,7 @@ Now let's implement some helper functions based on this grammar. First,
 
 > (is-nand? '((t nand f) nand (t nand t)))
 #t 
+
 > (is-nand? '((t and f) nand (t nand t)))
 #f
 ```
@@ -419,7 +439,8 @@ simplify:
 ;; converts a propositional logic expression into a 
 ;; logically equivalent one that uses only nand
 (define (to-nand expr)
-  (if (symbol? expr) expr
+  (if (symbol? expr) 
+      expr  ;; if expr is a symbol, return it unchanged
       (match expr
         [`(not ,a)    (let ([na (to-nand a)])
                         (make-nand na na))]
@@ -437,6 +458,7 @@ simplify:
 
 > (to-nand '(p and q))
 '((p nand q) nand (p nand q))
+
 > (to-nand '((p and q) or ((not p) or q)))
 '((((p nand q) nand (p nand q)) nand ((p nand q) nand (p nand q)))
   nand
@@ -457,11 +479,12 @@ Together, `to-nand` and `eval-nand` can implement `eval-prop-bool`:
   
 > (eval-prop-bool '(t or f))
 #t
+
 > (eval-prop-bool '((f or t) and (not (t or f))))
 #f
 ```
 
-This version compiles the expression to nand-only one, and then evaluates that
+This version compiles the expression to a nand-only one, and then evaluates that
 using `eval-nand`.
 
 ### Simplifying a Propositional Expression
@@ -490,6 +513,7 @@ propositional expressions:
 
 > (simplify '((not (not t)) and (not (not t))))
 (t and t)
+
 > (simplify '(t or ((not (not f)) and t)))
 '(t or (f and t))
 ```
@@ -513,11 +537,11 @@ two expressions are equivalent:
 (if test val1 val2)
 ```
 
-If-expressions are often preferred because they are a little simpler and easier
-to read. But when writing code you don't always know for sure if you have only
-one test, and so it's wise to use `cond` everywhere. After your program is done
-you could always go back and re-write single-condition `cond`s as equivalent
-if-expressions, but that is tedious and error-prone.
+If-expressions are often preferred because they are a little simpler. But when
+writing code you don't always know for sure if you have only one test, and so
+it's wise to use `cond` everywhere. After your program is done you could always
+go back and re-write single-condition `cond`s as equivalent if-expressions, but
+that is tedious and error-prone.
 
 Lets write a [Racket] function to do the work for us. We'll call
 single-condition `cond` expressions **simple conds**:
@@ -535,6 +559,11 @@ single-condition `cond` expressions **simple conds**:
                 (#t ,val2))   (map rewrite-simple-cond 
                                    (list 'if test val1 val2))]
         [_ (map rewrite-simple-cond expr)])))
+
+
+> (rewrite-simple-cond '(cond ((= x y) (f x))
+                              (else  (g x y))))
+'(if (= x y) (f x) (g x y))
 ```
 
 `(rewrite-simple-cond expr)` first checks if `expr` is a list; if it's *not* a
@@ -560,6 +589,14 @@ trick, we would have had to have used this longer expression:
 
 Write a function that converts a [Racket] `if` form into an equivalent `cond`
 form.
+
+For example:
+
+```lisp
+> (if-to-cond '(if (= x y) (f x) (g x y)))
+'(cond ((= x y) (f x))
+       (else (g x y)))
+```
 
 [Scheme]: https://en.wikipedia.org/wiki/Scheme_(programming_language)
 [Racket]: https://racket-lang.org/

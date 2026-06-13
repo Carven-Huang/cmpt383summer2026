@@ -3,21 +3,20 @@ tags: ["#racket"]
 ---
 
 **Functional programming** is a style of programming that focuses on
-*functions*. In particular, **higher-order functions**, which are functions that
-take functions as arguments, or return functions as values.
+**higher-order functions**, which are functions that take functions as
+arguments, or return functions as values.
 
-Three of the most useful higher-order functions are `map`, `filter`, and `fold`.
-Many other programming languages implement these functions, and they have a many
-different uses.
-
+Lets look at three of the most useful higher-order functions are `map`,
+`filter`, and `fold`.
 
 ## Mapping
 
 The `(map f lst)` function applies a given function to every element of a list:
 
-```scheme
+```lisp
 > (map sqr '(1 2 3 4))
 '(1 4 9 16)
+
 > (map list '(this is a test))
 '((this) (is) (a) (test))
 ```
@@ -27,9 +26,10 @@ In general, `(map f '(x1 x2 ... xn))` returns the value of `((f x1) (f x2) ...
 
 Here's an implementation of `map`:
 
-```scheme
+```lisp
 (define (my-map f lst)
-  (if (empty? lst) '()
+  (if (empty? lst) 
+      '()
       (cons (f (first lst))
             (my-map f (rest lst)))))
 ```
@@ -40,16 +40,16 @@ Suppose `lst` is a list of number lists, where a number list is a list of
 numbers. `lst` has zero or more number lists, and each number list has 0 or more
 numbers.
 
-Implement a function called `(add-sums lst)` that returns a new list that is the
-same as `lst` but the sum of each list of `lst` has its sum added as the first
-element.
+Implement a function called `(insert-sum lst)` that returns a new list that is
+the same as `lst` but the sum of each list of `lst` has its sum inserted as the
+first element.
 
 For example:
 
-```scheme
-> (add-sums '(() (1) (2 3)))
+```lisp
+> (insert-sum '(() (1) (2 3)))
 '((0) (1 1) (5 2 3))
-> (add-sums '((1 2 3) (4) (5 6) (7 0 0 1)))
+> (insert-sum '((1 2 3) (4) (5 6) (7 0 0 1)))
 '((6 1 2 3) (4 4) (11 5 6) (8 7 0 0 1))
 ```
 
@@ -66,7 +66,7 @@ should be 1.
 
 For example:
 
-```scheme
+```lisp
 > (normalize '(1 2 3))
 '(1/6 1/3 1/2)
 > (normalize '(10 5 2 2.1 3))
@@ -86,7 +86,7 @@ one input, and returns either `#f` or `#t`.
 `andmap` returns `#t` if *all* the elements on the list satisfy the predicate,
 and `#f` otherwise. For example:
 
-```scheme
+```lisp
 > (andmap even? '(1 2 3 4))
 #f
 > (andmap even? '(12 2 30 4))
@@ -95,9 +95,10 @@ and `#f` otherwise. For example:
 
 Here's an implementation:
 
-```scheme
+```lisp
 (define (my-andmap pred? lst)
-  (if (empty? lst) #t
+  (if (empty? lst) 
+      #t
       (and (pred? (first lst))
            (my-andmap pred? (rest lst)))))
 ```
@@ -108,7 +109,7 @@ recursive call to `my-andmap` is *not* made.
 `ormap` returns `#t` if 1, or more, elements on the list evaluate to `#t`, and
 `#f` otherwise:
 
-```scheme
+```lisp
 > (ormap even? '(1 2 3 4))
 #t
 > (ormap even? '(1 25 3 41))
@@ -117,9 +118,10 @@ recursive call to `my-andmap` is *not* made.
 
 Here's an implementation:
 
-```scheme
+```lisp
 (define (my-ormap pred? lst)
-  (if (empty? lst) #f   ;; base case different than my-andmap!
+  (if (empty? lst) 
+      #f   ;; base case different than my-andmap!
       (or (pred? (first lst))
           (my-ormap pred? (rest lst)))))
 ```
@@ -127,11 +129,13 @@ Here's an implementation:
 The built-in implementations of `map`, `andmap`, and `ormap` are a little more
 general than what we've done, as they allow for multiple lists. For example:
 
-```scheme
+```lisp
 > (map + '(1 2 3) '(4 5 6))
 '(5 7 9)
+
 > (andmap (lambda (a b) (> a b)) '(11 6 6) '(4 5 6))
 #f
+
 > (andmap (lambda (a b) (> a b)) '(11 6 7) '(4 5 6))
 #t
 ```
@@ -145,7 +149,7 @@ of zero or more numbers. Two numbers `x` and `y` have the same sign if `(equal?
  
  For example:
  
-```scheme
+```lisp
 > (same-sign? '(1 4 2))
 #t
 > (same-sign? '(-1 -4 -2))
@@ -174,7 +178,7 @@ We define [Racket] expression `e` to be a **sum-list** if:
 - the first element of each list on `e` is the sum of the rest of the elements
   on the list
 
-```scheme
+```lisp
 > (is-sum-list? '((3 1 2) (13 4 4 5)))
 #t
 > (is-sum-list? '())
@@ -193,34 +197,43 @@ We define [Racket] expression `e` to be a **sum-list** if:
 
 ## Filtering
 
-The `(filter pred? lst)` function removes items from a list that *don't* match a
-given predicate (a function that takes one input, and returns `#t` or `#f`). It
-*keeps* all the elements that satisfy it. For example:
+`(filter pred? lst)` makes a new list that contains just the elements of `lst`
+that satisfy `pred?`.
 
-```scheme
+`pred?` is a predicate function, which is a function that takes one input, and
+returns `#t` or `#f`.
+
+For example:
+
+```lisp
 > (filter odd? '(1 2 3 4 5 6))
 '(1 3 5)
+
 > (filter even? '(1 2 3 4 5 6))
 '(2 4 6)
-> (filter (lambda (lst) (>= (length lst) 2)) '((a b) (5) () (one two three)))
+
+> (filter (lambda (lst) (>= (length lst) 2))
+          '((a b) (5) () (one two three)))
 '((a b) (one two three))
 ```
 
 Here's an implementation:
 
-```scheme
+```lisp
 (define (my-filter pred? lst)
-  (cond [(empty? lst) '()]
+  (cond [(empty? lst) 
+           '()]
         [(pred? (first lst))
-         (cons (first lst) (my-filter pred? (rest lst)))]
+           (cons (first lst) (my-filter pred? (rest lst)))]
         [else
-         (my-filter pred? (rest lst))]))
+           (my-filter pred? (rest lst))]))
 ```
 
-As an example of how you might use `filter`, suppose you want to count the
-number of symbols in a list. You could do it like this:
+A common use of `filter` to count how many elements of a list satisfy a
+predicate. For example, to count the number of symbols in a list, you can do
+this:
 
-```scheme
+```lisp
 > (length (filter symbol? '(we have 4 kinds of 2 wheelers)))
 5
 ```
@@ -230,7 +243,7 @@ number of symbols in a list. You could do it like this:
 In your own words, briefly describe what this function does. What would be a
 better name for it than `f`?
 
-```scheme
+```lisp
 (define (f lst)
   (if (empty? lst) '()
       (filter (lambda (x) (not (equal? x (first lst))))
@@ -240,53 +253,62 @@ better name for it than `f`?
 ## Folding
 
 *Folding* applies a 2-argument function to a list in a way that combines all the
-elements into a final value. To understand how it works, first look at these
-concrete folding functions:
+elements into a final value. It's like a generalization of `+`, e.g. `(+ 2 5 3
+1)` sums all the elements of the list. 
 
-```scheme
+To understand how folding works, first look at these concrete folding functions:
+
+```lisp
 (define (sum lst)
-  (if (empty? lst) 0
+  (if (empty? lst) 
+      0
       (+ (first lst) (sum (rest lst)))))
 
 (define (prod lst)
-  (if (empty? lst) 1
+  (if (empty? lst) 
+      1
       (* (first lst) (prod (rest lst)))))
 
 (define (my-length lst)
-  (if (empty? lst) 0
+  (if (empty? lst) 
+      0
       (+ 1 (my-length (rest lst)))))
 ```
 
 Their implementations all follow the same pattern that we will call
 `fold-right`:
 
-```scheme
+```lisp
 ;; (f a (f b (f c init)))
 (define (fold-right f init lst)
-  (if (empty? lst) init
-      (f (first lst) (fold-right f init (rest lst)))))
+  (if (empty? lst) 
+      init
+      (f (first lst) 
+         (fold-right f init (rest lst)))))
 ```
 
 `fold-right` can implement each of the functions from above:
 
-```scheme
+```lisp
 > (fold-right + 0 '(1 2 3 4))
 10
+
 > (fold-right * 1 '(1 2 3 4))
 24
+
 > (fold-right (lambda (next accum) (+ accum 1)) 0 '(1 2 3 4))
 4
 ```
 
-The function `f` passed to `fold-right` takes two inputs, and it is helpful to
-call the first input `next` and the second input `accum`. The idea is that
-`next` is assigned each value of the list, one at a time, and `accum` is the
-*accumulation* of the results so far. How the values are accumulated depends on
-`f`.
+The function `f` passed to `fold-right` takes two inputs, and it is helpful to call
+the first input `next` and the second input `accum`. The idea is that `next` is
+assigned each value of the list, one at a time, and `accum` is the
+*accumulation* of the results so far. Exactly how the values are accumulated
+depends on `f`.
 
 `fold-right` is quite general. It can, for instance, implement `map`:
 
-```scheme
+```lisp
 (define (my-map2 f lst)
   (fold-right (lambda (next accum) (cons (f next) accum))
               '()
@@ -294,25 +316,24 @@ call the first input `next` and the second input `accum`. The idea is that
 
 > (my-map2 list '(one two (three)))
 '((one) (two) ((three)))
+
 > (my-map2 sqr '(2 3 5))
 '(4 9 25)
 ```
 
 ## Challenge: filtering with fold
 
-Using just one call to `fold-right`, implement the function `(my-filter pred?
-lst)`.
+Using just one call to `fold-right`, implement the function `(my-filter pred? lst)`.
 
 ## Folding consed-out lists
 
-Many programmers find folds tricky to think about at first (and second, and
-third, ...). For example, what does `(fold-right cons '() '(a b c d))` evaluate
-to?
+Folds can be tricky to think about at first (and second, and third, ...). For
+example, what does `(fold-right cons '() '(a b c d))` evaluate to?
 
 Here is a perspective that can help with right folds. Any list can be written in
 consed-out form, e.g. `'(a b c d)` is:
 
-```scheme
+```lisp
 > (cons 'a (cons 'b (cons 'c (cons 'd '()))))
 '(a b c d)
 ```
@@ -320,7 +341,7 @@ consed-out form, e.g. `'(a b c d)` is:
 You can think of `(fold-right f init '(a b c d))` as *replacing* `cons` with `f`
 and `'()` with `init` in the consed-out list:
 
-```scheme
+```lisp
 (fold-right f init '(a b c d))
 
 ;; is the same as
@@ -330,7 +351,7 @@ and `'()` with `init` in the consed-out list:
 
 For example, `(fold-right + 0 '(1 2 3))` evaluates this expression:
 
-```scheme
+```lisp
 (+ 1 (+ 2 (+ 3 0)))
 ```
 
@@ -343,14 +364,15 @@ in *reverse* order, from the right end to the left end. For example,
 first `(+ 3 0)` is calculated, and then `(+ 2 3)` is calculated, and finally `(+
 1 5)`.
 
-For some expressions, that might not be the order you want, and so the
+For some expressions, that might not be the order you want, and so there is the
 `fold-left` function applies `f` from left to right. It is usually defined like
 this:
 
-```scheme
+```lisp
 ;; (f (f (f init a) b) c)
 (define (fold-left f init lst)
-  (if (empty? lst) init
+  (if (empty? lst) 
+      init
       (fold-left f (f init (first lst)) (rest lst))))
 ```
 
@@ -361,10 +383,10 @@ both time and memory. For this reason, in practice, left folds are often
 preferable to right folds.
 
 Both left and right folds are built-in functions in [Racket]. `foldr` is the
-same as our `fold-right`, but `foldl` is not defined quite the same as
+same as our `foldr`, but `foldl` is not defined quite the same as
 `fold-left` (the `show` function is defined below):
 
-```scheme
+```lisp
 > (foldl show 'init '(a b c d))
 '(f d (f c (f b (f a init))))
 > (fold-left show 'init '(a b c d))
@@ -373,9 +395,9 @@ same as our `fold-right`, but `foldl` is not defined quite the same as
 
 ## Folding Example: deep-count re-visited
 
-The function `deep-count` was an example in previous notes:
+The function `deep-count` was written in previous notes:
 
-```scheme
+```lisp
 ;;
 ;; Returns the number of numbers on lst, even numbers
 ;; inside of lists:
@@ -397,9 +419,9 @@ The function `deep-count` was an example in previous notes:
 This implementation is straightforward. Its body is a `cond` that handles all
 the possible cases of items on a list (plus the special case of the empty list).
 
-A more functional way to implement this is to use `foldr` and `map`. The idea of
-this implementation is to replace each item on the list with how many numbers it
-contains. There are three kinds of items:
+A more functional way to implement this is to use `foldr` and `map`. The idea is
+to replace each item on the list with how many numbers it contains. There are
+three kinds of items:
 
 - A number is replaced by a 1.
 
@@ -411,7 +433,7 @@ contains. There are three kinds of items:
 This gives us a list of numbers whose sum is the number of numbers in the
 list. For example:
 
-```scheme
+```lisp
 '(a 9 (b 8 9) ((up (or 16 you))))
 
 becomes
@@ -423,7 +445,7 @@ The sum of `'(0 1 2 1)'` is 4, which is the correct answer.
 
 Here's the code:
 
-```scheme
+```lisp
 (define (sum lst) (foldr + 0 lst))
 
 (define (deep-count-num lst)       
@@ -457,7 +479,7 @@ Implement a function `(deep-sum lst)` that works like `deep-count`, except
 instead of returning the number of numbers in `lst` it returns their sum. For
 example:
 
-```scheme
+```lisp
 > (deep-sum '(9 (b 8 9) ((up (or 16 you)))))
 42
 ```
@@ -467,7 +489,7 @@ example:
 To better understand how folds work, lets write a function that calculates the
 structure of a fold. First, we define this function:
 
-```scheme
+```lisp
 (define (show next acc)
   (cons 'f (cons next (list acc))))
   
@@ -478,17 +500,17 @@ structure of a fold. First, we define this function:
 By passing `show` to the various fold functions, we get a list showing the
 order of evaluation. For example:
 
-```scheme
-> (fold-right show '() '(a b c))
+```lisp
+> (foldr show '() '(a b c))
 '(f a (f b (f c ())))
 > (foldr show '() '(a b c))
 '(f a (f b (f c ())))
 ```
 
-This shows that both our `fold-right`, and the built-in [Racket] `foldr`
+This shows that both our `foldr`, and the built-in [Racket] `foldr`
 evaluate to the same thing. However, `fold-left` and `foldl` are different:
 
-```scheme
+```lisp
 > (fold-left show '() '(a b c))
 '(f (f (f () a) b) c)
 > (foldl show '() '(a b c))
@@ -497,9 +519,9 @@ evaluate to the same thing. However, `fold-left` and `foldl` are different:
 
 This last expression suggests that `foldl` could be implemented like this:
 
-```scheme
+```lisp
 (define (my-foldl f init lst)
-  (fold-right f init (reverse lst)))
+  (foldr f init (reverse lst)))
 ```
 
 However, this is *not* how [Racket] implements `foldl`. According to [the
@@ -507,7 +529,7 @@ documentation for foldl and foldr]
 (https://docs.racket-lang.org/reference/pairs.html#%28def._%28%28lib._racket%2Fprivate%2Flist..rkt%29._foldl%29%29),
 `foldl` uses a *constant* amount of space to process the list, while `foldr`
 uses an amount of space proportional to the size of the list. But this
-implementation of `my-foldl` calls `fold-right`, meaning it uses space
+implementation of `my-foldl` calls `foldr`, meaning it uses space
 proportional to the size of the list.
 
 [Scheme]: https://en.wikipedia.org/wiki/Scheme_(programming_language)

@@ -30,7 +30,7 @@ study after Racket), which does not allow loops or mutating functions.
 ### Lecture 1,2 Racket: Basics
 
 - [Introduction to Racket](racket_intro.md)
-- Sample programs:[hello_world.rkt](hello_world.rkt), [hello_name.rkt](hello_name.rkt)
+
 
 ### Lecture 3 Racket: Lists, Symbols, and Recursion
 

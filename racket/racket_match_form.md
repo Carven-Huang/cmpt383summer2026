@@ -22,7 +22,7 @@ Please read [Matching](https://docs.racket-lang.org/guide/match.html) from the
 One way to check for simple infix expressions is to build a checking function
 out of smaller helper functions:
 
-```scheme
+```lisp
 ;; returns true iff x is a list of length n
 (define (nlist? x n)
   (and (list? x)
@@ -38,8 +38,10 @@ out of smaller helper functions:
 
 > (is-basic-expr? '(+ 2))
 #t
+
 > (is-basic-expr? '(4 + 2))
 '(+ - * /)
+
 > (is-basic-expr? '(4 + 2 + 1))
 #f
 ```
@@ -52,7 +54,7 @@ between unary and binary expressions.
 
 Now lets use `match` to write the same function:
 
-```scheme
+```lisp
 (define (is-basic-expr2? x)
   (if (number? x) #t
       (match x       
@@ -63,8 +65,10 @@ Now lets use `match` to write the same function:
 
 > (is-basic-expr? '(+ 2))
 #t
+
 > (is-basic-expr? '(4 + 2))
 '(+ - * /)
+
 > (is-basic-expr? '(4 + 2 + 1))
 #f
 ```
@@ -80,9 +84,21 @@ none of the earlier patterns match.
 
 ## Matching with Quasiquoting
 
-Quasiquoting often plays nicely with `match`, e.g.:
+**Quasiquoting** often plays nicely with `match`. Quasiquoting is like regular
+quoting, but you use a backquote instead if a single quote, and you can unquote
+parts of the expression using a comma. For example:
 
-```scheme
+```lisp
+> '(a (+ 1 2) c)   ;; quoted expression
+'(a (+ 1 2) c)
+
+> `(a ,(+ 1 2) c)   ;; quasiquoted expression
+'(a 3 c)
+```
+
+With `match`, you can use quasiquoting to match parts of the expression:
+
+```lisp
 (define (is-basic-expr3? x)
   (or (number? x)
       (match x       
@@ -92,12 +108,12 @@ Quasiquoting often plays nicely with `match`, e.g.:
         )))
 ```
 
-`` `(,op ,a)`` is the same as `(list op a)`, and visually looks a little more
-like the structure of the list it matches.
+`` `(,op ,a)`` is the same as `(list op a)`, and visually looks more like the
+structure of the list it matches.
 
-Another way  is to explicitly list every case:
+Another way write this is to explicitly list every case:
 
-```scheme
+```lisp
 (define (is-basic-expr4? x)
   (or (number? x)
       (match x       
@@ -116,15 +132,15 @@ variable. Just by looking at the `match` expression we can see all the
 operators. In the pattern `(,a + ,b)`, the `+` does *not* have a comma in front
 of it, and so an actual `+` symbol must appear in `x` to match.
 
-Now suppose want to *evaluate* simple infix expressions, i.e. `(3 + 6)`
-evaluates to 9. With a few small changes to `is-basic-expr4` we get this:
+Now suppose want to *evaluate* our infix expressions, i.e. `(3 + 6)` evaluates
+to 9. With a few small changes to `is-basic-expr4` we get this:
 
-```scheme
+```lisp
 (define (basic-eval x)
   (if (number? x) x
       (match x       
-        [`(- ,a) (- a)]
-        [`(+ ,a) (+ a)]
+        [`(- ,a)    (- a)]
+        [`(+ ,a)    (+ a)]
         [`(,a + ,b) (+ a b)]
         [`(,a - ,b) (- a b)]
         [`(,a * ,b) (* a b)]
@@ -133,8 +149,10 @@ evaluates to 9. With a few small changes to `is-basic-expr4` we get this:
 
 > (basic-eval '(4 + 3))
 7
+
 > (basic-eval '(4 / 3))
 1 1/3
+
 > (basic-eval '(4 ^ 2))
 'error
 ```
@@ -144,7 +162,7 @@ If `x` is not a valid expression, then `basic-eval` causes an error using the
 
 Division by 0 causes this error:
 
-```scheme
+```lisp
 > (basic-eval '(2 / 0))
 . . /: division by zero
 ```
@@ -152,7 +170,7 @@ Division by 0 causes this error:
 Suppose we want a customized error message for division by 0. We add that using
 another pattern:
 
-```scheme
+```lisp
 (define (basic-eval x)
   (if (number? x) x
       (match x       
@@ -176,12 +194,12 @@ Now lets generalize `basic-eval` to allow for sub-expressions, i.e. we want to
 evaluate full infix expressions like `((4 / 2) - (2 * 3))`. We can do it like
 this:
 
-```scheme
+```lisp
 (define (arith-eval x)
   (if (number? x) x
       (match x
-        [`(- ,a) (- (arith-eval a))]
-        [`(+ ,a) (+ (arith-eval a))]
+        [`(- ,a)    (- (arith-eval a))]
+        [`(+ ,a)    (+ (arith-eval a))]
         [`(,a + ,b) (+ (arith-eval a) (arith-eval b))]
         [`(,a - ,b) (- (arith-eval a) (arith-eval b))]
         [`(,a * ,b) (* (arith-eval a) (arith-eval b))]
@@ -191,9 +209,6 @@ this:
 > (arith-eval '((1 - 2) * (10 / (2 * 2))))
 -2 1/2
 ```
-
-While this function is not as short as it could be, each possible pattern for
-`x` is explicitly given beside its associated evaluation.
 
 
 ## Challenge: calculating with history
@@ -206,7 +221,7 @@ recent values are on the *right end* of `history`.
 
 Assume `history` is defined globally like this:
 
-```scheme
+```lisp
 (define history '())
 ```
 
@@ -216,30 +231,39 @@ should be recorded on `history`.
 
 Here are some examples of how it should work:
 
-```scheme
+```lisp
 > history
 '()
+
 > (arith-eval2 '(1 + (3 * 4)))
 13
+
 > history
 '(((1 + (3 * 4)) 13))
+
 > (arith-eval2 '(5 * 5))
 25
+
 > history
 '(((1 + (3 * 4)) 13) ((5 * 5) 25))
+
 > (arith-eval2 '(5 * 5 * 5))
 'error
+
 > history
 '(((1 + (3 * 4)) 13) ((5 * 5) 25) ((5 * 5 * 5) error))
 ```
 
 **Hint** Use the `(set! var val)` form to change `history`. For example:
 
-```scheme
+```lisp
 > (define food '())
+
 > food
 '()
+
 > (set! food (cons 'cereal food))
+
 > food
 '(cereal)
 ```
@@ -252,7 +276,7 @@ parameter list (`(a b)` in this example), and the body of the function.
 
 Here's one way to do it:
 
-```scheme
+```lisp
 (define (is-def? e)
   (match e
     [(list 'define (list name params ...) body) 
@@ -261,6 +285,7 @@ Here's one way to do it:
 
 > (is-def? '(define (inc x) (+ x 1)))
 '(inc (x) (+ x 1))
+
 > (is-def? '(inc 5))
 #f
 ```
@@ -280,7 +305,7 @@ its function body.
 
 For example:
 
-```scheme
+```lisp
 > (is-lambda? '(lambda (n) (* n n)))
 '((n) (* n n))
 > (is-lambda? '(lambda (a b) (+ a b)))
