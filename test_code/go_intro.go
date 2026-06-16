@@ -1,7 +1,7 @@
 package main // executable program
 import (
 	"fmt"
-	"time"
+	"math"
 )
 
 // format package
@@ -20,6 +20,17 @@ Chapter 9 concurrency
 func worker(id int, pipe chan int) {
 	result := id * 2
 	pipe <- result
+}
+
+func gen() chan int {
+	ch := make(chan int)
+	go func() {
+		for i := 0; ; i++ {
+			ch <- i
+		}
+	}()
+
+	return ch
 }
 
 /*
@@ -58,9 +69,44 @@ func Index[T comparable](items []T, target T) int {
 	return -1
 }
 
+// Generic stack
+type Stack[T any] struct {
+	items []T
+}
+
+func (s *Stack[T]) Push(item T) {
+	s.items = append(s.items, item)
+}
+func (s *Stack[T]) Pop() T {
+	last_index := len(s.items) - 1
+	last := s.items[last_index]
+	s.items = s.items[:last_index]
+	return last
+
+}
+
 func main() {
-	go sayHello()
-	time.Sleep(100 * time.Millisecond)
+
+	numbers := gen()
+	fmt.Println(<-numbers)
+	fmt.Println(<-numbers)
+	fmt.Println(<-numbers)
+	fmt.Println(<-numbers)
+
+	// ch := make(chan int)
+	// go worker(2, ch)
+	// result := <-ch
+	// fmt.Println(result)
+
+	// p := Point{x: 3, y: 3}
+	// p.Update(0.1, 0.2)
+	// fmt.Println(p.Distance())
+	// p.RealUpdate(0.1, 0.2)
+	// fmt.Println(p.Distance())
+	// fmt.Println(p)
+
+	// go sayHello()
+	// time.Sleep(100 * time.Millisecond)
 
 	// alist := []int{1, 2, 3, 4, 5, 6}
 	// target := 5
@@ -96,10 +142,26 @@ func main() {
 	Chapter 6 -----------------------
 */
 
-// type Point struct {
-// 	x float64
-// 	y float64
-// }
+type Point struct {
+	x float64
+	y float64
+}
+
+func (p Point) Distance() float64 {
+	return math.Sqrt(p.x*p.x + p.y*p.y)
+}
+
+func (p Point) Update(dx, dy float64) {
+	p.x += dx
+	p.y += dy
+}
+func (p *Point) RealUpdate(dx, dy float64) {
+	p.x += dx
+	p.y += dy
+}
+func (p Point) Stringer() string {
+	return fmt.Sprintf("x: %f, y: %f", p.x, p.y)
+}
 
 // type Animal interface {
 // 	Speak() string
