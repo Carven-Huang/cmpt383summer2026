@@ -121,10 +121,9 @@ You will see the following in [Racket] programs we write for this course:
   to `#t`.
 
 - **Symbols**, e.g. `'a`, `'mustard`, `'color-of-first-shape`; symbols are
-  *like* strings, but are used quite differently. The `'` in front of a symbol
-  is called a **single-quote**, or **quote** for short, and is essential for
-  distinguishing symbols from variables, e.g. `x` is a variable, while `'x` is a
-  symbol.
+  *like* strings, but are used quite differently. The `'` is called a
+  **single-quote**, or **quote** for short, and is essential for distinguishing
+  symbols from variables, e.g. `x` is a variable, while `'x` is a symbol.
 
 - **Quoted Lists**, e.g. `'(a b 1 (2 3) ())`; quoted lists are lists that are
   sequences of values. They are just data, and evaluate to themselves. For
@@ -615,7 +614,8 @@ to true, and `#f` otherwise. For example:
 Importantly, `and` uses **short-circuiting**: its inputs are evaluated in the
 order they're given (left to right), and after the first one evaluates to `#f`,
 the expression immediately returns `#f` without evaluating any more of the
-expressions.
+expressions. In contrast, in math and logic the order of evaluation doesn't
+matter, i.e. $p \land q$ and $q \land p$ are logically equivalent.
 
 For example, this function relies on the fact that `and` is short-circuited:
 
@@ -648,9 +648,9 @@ The `or` form is similar to `and`, and it evaluates logical "or": `(or <test1>
 ```
 
 `or` uses short-circuit evaluation: the tests are evaluated in order (from left
-to right), and soon as one evaluates to `#t` no further tests are evaluated and
-the entire expression evaluates to `#t`. For instance, this expression returns
-`#t` thanks to short-circuiting:
+to right), and as soon as one evaluates to `#t` no further tests are evaluated
+and the entire expression evaluates to `#t`. For instance, this expression
+returns `#t` thanks to short-circuiting:
 
 ```lisp
 > (or (= 2 2) (error "oops"))
@@ -664,9 +664,8 @@ Changing the order of evaluation changes the results:
 . . oops
 ```
 
-Finally, `cond` form is similar to if-else-if structures in other languages. It
-evaluates boolean expressions and returns the result of the first true
-expression. For example:
+Finally, the `cond` form is similar to if-else-if structures in other languages.
+For example:
 
 ```lisp
 (define (sign n)
