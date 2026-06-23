@@ -241,7 +241,7 @@ Lists are nested pairs. Written as pairs, `'(3 4 5)` has this structure:
 
 In memory it looks like this:
 
-<img src="list123.png" width="400" alt="list 123 diagram">
+<img src="list123.png"  alt="list 123 diagram">
 
 It has the structure `'(3 . something)`, and so it's a pair.
 
