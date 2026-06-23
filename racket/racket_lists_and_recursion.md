@@ -210,7 +210,6 @@ short. `pair?` tests if a value is a pair:
 A dotted pair is implemented in memory as a **cons cell**, a value with two
 pointers:
 
-![[consCell.png|200]]
 <img src="consCell.png" width="200" alt="cons cell diagram">
 
 Diagrams like this are called **cons cell diagrams**.
@@ -242,7 +241,7 @@ Lists are nested pairs. Written as pairs, `'(3 4 5)` has this structure:
 
 In memory it looks like this:
 
-![[list123.png]]
+<img src="list123.png" width="200" alt="list 123 diagram">
 
 It has the structure `'(3 . something)`, and so it's a pair.
 
