@@ -81,6 +81,10 @@ Implementing it as a [Racket] function doesn't work:
 . . assert: assertion fail: #f
 ```
 
+> The form `(when <test> <body>)` evaluates to `body` if `test` is `#t`, and
+> does nothing if `test` is `#f`. It's a kind of conditional form that only
+> evaluates to a useful value if `test` is `#t`.
+
 The problem is the error message in the second call: it prints `#f`, when
 instead what we want to see is the unevaluated expression `(= 1 2)`. But
 `assert-bad` can't possibly print `(= 1 2)` because it gets passed `#f`, the
@@ -242,7 +246,9 @@ and so returns the same value as:
 ```
 
 This returns the value of `(= #f 5)`, which is an error (`=` only works with
-numbers).
+numbers). This is an example of **variable capture**: the local `x` variable in
+`my-or` "captured" the passed-in variable `x` with the same name, and phenomenon
+that can cause subtle bugs in programs.
 
 So it seems `(my-or #f (= x 5))` *should* cause an error. But it doesn't: it
 *correctly* returns `#t`.

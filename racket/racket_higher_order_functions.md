@@ -62,8 +62,9 @@ The `eval` function takes an entire list as input and evaluates it:
 ```
 
 `eval` is a very powerful: it is essentially [Racket] implemented in [Racket]!
-In general, you should avoid using `eval` in most situations. Instead, use
-regular [Racket] code.
+In practice, it is a bit tricky to use correctly in [Racket] and sometimes
+requires setting up namespaces. We won't cover that here, but, in general, you
+should avoid using `eval` in most situations.
 
 > It turns out that it is possible to implement the `eval` function using only
 > a few elementary [Racket] functions. Such a function is called a
@@ -411,7 +412,7 @@ of `n`", where function composition is used instead of multiplication.
 
 ## Composing Multiple Functions
 
-[Racket]'s built-in `compose` function lets you tcompose 2 or more functions.
+[Racket]'s built-in `compose` function lets you compose 2 or more functions.
 It's instructive to implement our own version of this, so lets write a function
 called `(compose-all f1 f2 ... fn)` that returns the composition of `f1` to
 `fn`, i.e. `(f1 (f2 ... (fn x)))`.
