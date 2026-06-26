@@ -48,7 +48,7 @@ study after Racket), which does not allow loops or mutating functions.
 
 - [Maps, filters, and folds](racket_maps_filters_folds.md)
 
-### Lecture 5,6 Racket: Higher Order Functions
+### Lecture 5, 6 Racket: Higher Order Functions
 
 - [Higher order functions](racket_higher_order_functions.md)
 - [The Racket match form](racket_match_form.md)

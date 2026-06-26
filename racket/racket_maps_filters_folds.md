@@ -197,11 +197,11 @@ We define [Racket] expression `e` to be a **sum-list** if:
 
 ## Filtering
 
-`(filter pred? lst)` makes a new list that contains just the elements of `lst`
+`(filter pred? lst)` returns a new list that contains just the elements of `lst`
 that satisfy `pred?`.
 
-`pred?` is a predicate function, which is a function that takes one input, and
-returns `#t` or `#f`.
+`pred?` is a **predicate function**, which is a function that takes one input,
+and returns `#t` or `#f`.
 
 For example:
 
@@ -287,7 +287,7 @@ Their implementations all follow the same pattern that we will call
          (fold-right f init (rest lst)))))
 ```
 
-`fold-right` can implement each of the functions from above:
+`fold-right` can implement each of the above functions in one line:
 
 ```lisp
 > (fold-right + 0 '(1 2 3 4))
@@ -300,11 +300,11 @@ Their implementations all follow the same pattern that we will call
 4
 ```
 
-The function `f` passed to `fold-right` takes two inputs, and it is helpful to call
-the first input `next` and the second input `accum`. The idea is that `next` is
-assigned each value of the list, one at a time, and `accum` is the
-*accumulation* of the results so far. Exactly how the values are accumulated
-depends on `f`.
+The function `f` passed to `fold-right` must take two inputs, and it is helpful
+to call the first input `next` and the second input `accum`. The idea is that
+`next` gets assigned each value of the list, one at a time, and `accum`
+*accumulates* the results. Exactly how the values are accumulated depends on
+`f`.
 
 `fold-right` is quite general. It can, for instance, implement `map`:
 
@@ -327,8 +327,8 @@ Using just one call to `fold-right`, implement the function `(my-filter pred? ls
 
 ## Folding consed-out lists
 
-Folds can be tricky to think about at first (and second, and third, ...). For
-example, what does `(fold-right cons '() '(a b c d))` evaluate to?
+Folds can be tricky to think about. For example, what does `(fold-right cons '()
+'(a b c d))` evaluate to?
 
 Here is a perspective that can help with right folds. Any list can be written in
 consed-out form, e.g. `'(a b c d)` is:
@@ -360,9 +360,8 @@ to `'(a b c d)`.
 
 `fold-right` is called a *right* fold because it processes the items in the list
 in *reverse* order, from the right end to the left end. For example,
-`(fold-right + 0 '(1 2 3))` is this: `(+ 1 (+ 2 (+ 3 0))`. In this expression,
-first `(+ 3 0)` is calculated, and then `(+ 2 3)` is calculated, and finally `(+
-1 5)`.
+`(fold-right + 0 '(1 2 3))` is this: `(+ 1 (+ 2 (+ 3 0))`. First `(+ 3 0)` is
+calculated, and then `(+ 2 3)` is calculated, and finally `(+ 1 5)`.
 
 For some expressions, that might not be the order you want, and so there is the
 `fold-left` function applies `f` from left to right. It is usually defined like
@@ -451,12 +450,30 @@ Here's the code:
 (define (deep-count-num lst)       
   (sum
    (map (lambda (x)
-          (cond [(list? x) (deep-count-num x)]
-                [(number? x) 1]
-                [else 0]
+          (cond [(list? x) 
+                 (deep-count-num x)]
+                [(number? x) 
+                 1]
+                [else 
+                 0]
                 ))
         lst)))
 ```
+
+Here's a similar implementation using a helper function:
+
+```lisp
+(define (bool->int b) (if b 1 0))
+
+(define (deep-count-num lst)       
+  (sum
+   (map (lambda (x)
+          (if (list? x) 
+              (deep-count-num x)
+              (bool->int (number? x))))
+        lst)))
+```
+
 
 Compared to the earlier `deep-count`:
 

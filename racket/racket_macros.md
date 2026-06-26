@@ -284,7 +284,7 @@ In C++, macros are *not* hygienic. Consider this example from [the Wikipedia
 article on hygienic macros](https://en.wikipedia.org/wiki/Hygienic_macro):
 
 ```cpp
-#define INCI(i) do { int a=0; ++i; } while(0)
+#define INCI(i) do { int a = 0; ++i; } while (0)
 
 int main(void)
 {

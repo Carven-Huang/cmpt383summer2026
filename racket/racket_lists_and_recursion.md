@@ -816,7 +816,7 @@ Here's an implementation of `flatten`:
         [(list? (first x))
            (append (my-flatten (first x))
                    (my-flatten (rest x)))]
-        [else 
+        [else ;; first element is not a list
            (cons (first x) 
                  (my-flatten (rest x)))]
 ))

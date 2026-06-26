@@ -4,7 +4,6 @@
 input, or return functions as output. For instance, `map`, `filter`, and
 `fold-right` are all higher order functions. Here we discuss a few more.
 
-
 ## apply
 
 The usual way of evaluating function calls in [Racket] is like this:
@@ -230,8 +229,8 @@ Conceptually, you can think of a closure as being a **let over lambda**:
 6
 ```
 
-`g1` not *just* a function, but a function along with variable bindings that it
-needs.
+`g1` is not *just* a function, but a function along with variable bindings that
+it needs.
 
 **Free variables** are variables that appear in a function but aren't declared
 in the function. For example, `n` is free in `(lambda (x) (+ n x))`. Any
@@ -613,7 +612,7 @@ Any function that takes 2 inputs can be curried. For example:
 > [curryr](https://docs.racket-lang.org/reference/procedures.html#%28def._%28%28lib._racket%2Ffunction..rkt%29._curryr%29%29)
 > that you should use if you want to curry functions in your programs.
 
-Finally, the `uncurry2` function takes a 2-argument curried function as input
+Finally, the `uncurry2` function takes a 2-argument *curried* function as input
 and returns a non-curried version of it:
 
 ```lisp
