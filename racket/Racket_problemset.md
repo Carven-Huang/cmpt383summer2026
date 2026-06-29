@@ -46,9 +46,9 @@ For example:
 #t
 > (my-subset? '(2 1 3) '(1 2))
 #f
-> (my-subset? '(a d (3 1)) '(1 a (3 d))
+> (my-subset? '(a d (3 1)) '(1 a (3 d)))
 #f
-> (my-subset? '((1) (2 2)) '((3 3 3) a (2 2) (1))
+> (my-subset? '((1) (2 2)) '((3 3 3) a (2 2) (1)))
 #t
 ```
 
