@@ -70,115 +70,6 @@ should avoid using `eval` in most situations.
 > **meta-circular interpreter**.
 
 
-## The Scope of Names: Static Scoping vs Dynamic Scoping
-
-The **scope** of a name is where it is visible. A **local variable** is a
-variable whose scope is restricted to the block of code where it was declared. A
-**nonlocal variable** is visible outside of the block in which it was declared.
-**Global variables** are nonlocal variables that can be used anywhere in a
-program.
-
-Most modern languages, including [Racket], are **statically scoped** (or
-**lexically scoped**). This means that a variable's scope can be determined
-*before* the program runs just by examining the source code. Static scoping
-helps programmers to read source code and determine what values names are bound
-to without the need to run the code.
-
-Consider this [Racket] code:
-
-```lisp
-(define x 1)
-(define f (lambda (x) (g 2)))
-(define g (lambda (y) (+ x y)))  ;; Which x does this refer to?
-```
-
-[Racket] is statically scoped, and so if you evaluate `(f 5)` the answer is 3
-(because the `x` in `g` refers to the `x` whose value is 1). If [Racket] were
-instead dynamically scoped, i.e. if the most recently encountered variable named
-`x` was used in `g`, then the answer would be 7.
-
-It is useful to trace this in some detail. Before `(f 5)` is called, `x` was
-bound to 1 by the first `define`. When `(f 5)` is called, the 5 is bound to
-`x` in the lambda expression for `f`. Then `(g 2)` is called, and the 2 is
-bound `y` in the lambda expression for `g`. So at this point, there are three
-bound variables: `x` bound to 1, `x` bound to 5, and `y` bound to 2. In `g`s
-body expression `(+ x y)`, what value should be used for `x`? Should it be 1,
-or should it be 2? [Racket] is statically scoped, and so it decides on
-bindings *before* the code runs, which means it must use the `x` bound to 1.
-However, in a **dynamically scoped** language, the most recently bound value
-of `x` is used. If [Racket] were dynamically scoped, then `(f 5)` would print
-7.
-
-Here's a  [JavaScript] example of static scoping:
-
-```javascript
-function big() {
-    function sub1() {
-        var x = 7;   // hides the x defined in big
-        sub2();
-    }
-
-    function sub2() {
-        var y = x;      // which x does this refer to?
-    }
-    var x = 3;
-    sub1();
-}
-```
-
-[JavaScript] is statically scoped, and so the `x` in `sub2` is the `x` with the
-value 3 that is defined in `big`. If [JavaScript] were dynamically scoped, then
-`x` would refer to the most recently bound `x` at runtime, i.e. the `x` bound to
-7.
-
-Dynamic scoping is an alternative to static scoping that has largely fallen out
-of favor. Most examples of dynamic scoping occur in older languages, such as
-[APL](https://en.wikipedia.org/wiki/APL_(programming_language)),
-[SNOBOL](https://en.wikipedia.org/wiki/SNOBOL), and early versions of [LISP].
-Some languages, such as [Perl], let you optionally declare variables that follow
-dynamic scoping rules.
-
-The idea of dynamic scoping is that the meaning of a variable depends upon the
-value of the most recent variable with the same name in the current function
-call stack (as opposed to the enclosing block of source code).
-
-Here is one more example showing the difference between static and dynamic
-scoping using a C++-like language:
-
-```cpp
-const int b = 5;    
-
-int foo()
-{
-   int a = b + 5;  // What is b?
-   return a;
-}
- 
-int bar()
-{
-   int b = 2;
-   return foo();
-}
- 
-int main()
-{
-   foo(); // returns 10 for static scoping; 10 for dynamic scoping
-   bar(); // returns 10 for static scoping; 7 for dynamic scoping
-}
-```
-
-In general, dynamic scoping makes it harder to reason about the meaning of
-programs from their source code alone. Under dynamic scoping, you can't always
-tell for sure what a variable refers to until the code runs, because the order
-in which functions are called matters.
-
-Another problem with dynamic scoping is that it exposes the local variables of a
-function to other functions, thus allowing the possibility that they could be
-modified. This breaks function encapsulation.
-
-On the plus side, dynamic scoping is easier to implement than static scoping.
-
-
 ## Closures
 
 A **closure** combines two things: a function, and an environment of `(variable
@@ -318,16 +209,41 @@ variables that can only be accessed through functions.
 ## Composing Functions
 
 Another interesting feature of [Racket] is **composing** functions. Recall how
-function composition works in mathematics. If $f(x) = x^2$ and $g(x) = 2x + 1$,
-the composition of $f$ and $g$ is $f(g(x)) = g(x)^2 = (2x + 1)^2 = 4x^2 + 4x +
-1$. This is denoted $f \circ g$, or $f \circ g \;(x)= (2x + 1)^2 = 4x^2 + 4x +
-1$.
+function composition works in mathematics. Suppose you have these two functions:
+
+$$
+\begin{align*}
+f(x) &= x^2 \\
+g(x) &= 2x + 1
+\end{align*}
+$$
+
+The composition of $f$ and $g$ is:
+
+$$
+\begin{align*}
+f(g(x)) &= g(x)^2 \\
+        &= (2x + 1)^2 \\
+        &= 4x^2 + 4x + 1
+\end{align*}
+$$
+
+This is denoted $f \circ g$, i.e. $\circ$ is the function composition operator:
+
+$$
+\begin{align*}
+(f \circ g)(x) &= (2x + 1)^2 \\
+               &= 4x^2 + 4x +1
+\end{align*}
+$$
 
 In [Racket], we can compose functions directly by calling them:
 
 ```lisp
 (define (f x) (* x x))
 (define (g x) (+ (* 2 x) 1))
+
+;; h composes f and g
 (define (h x) (f (g x)))
 
 > (f 2)
@@ -340,8 +256,8 @@ In [Racket], we can compose functions directly by calling them:
 25
 ```
 
-We can also write a function that composes functions. For instance, the `comp`
-function takes two single-input functions as input and returns their
+We can also write a function that returns a composed function. For instance, the
+`comp` function takes two single-input functions as input and returns their
 composition:
 
 ```lisp
@@ -416,10 +332,9 @@ It's instructive to implement our own version of this, so lets write a function
 called `(compose-all f1 f2 ... fn)` that returns the composition of `f1` to
 `fn`, i.e. `(f1 (f2 ... (fn x)))`.
 
-A neat feature of `compose-all` is that the functions are *not* passed on a
-list. Instead writing `(compose-all (list f1 f2 ... fn))`, we write
-`(compose-all f1 f2 ... fn)`. Using this trick require a special form of
-`define`:
+A neat feature of this function is that it has a variable number of arguments.
+Instead of writing `(compose-all (list f1 f2 ... fn))`, we write `(compose-all
+f1 f2 ... fn)`. It works using a `.` like this:
 
 ```lisp
 (define (compose-all . fns)  ;; fns is the list of arguments
@@ -427,35 +342,62 @@ list. Instead writing `(compose-all (list f1 f2 ... fn))`, we write
 )
 ```
 
-`compose-all` is the name of the function, and `fns` is a list containing all
-the arguments passed to it. So when `(compose-all f1 f2 f3)` is called, `fns` is
+`compose-all` is the function name, and `fns` is a list containing all the
+arguments passed to it. So when `(compose-all f1 f2 f3)` is called, `fns` is
 `(list f1 f2 f3)`.
 
-Here's a complete implementation of `compose-all`s:
+To write this function, lets look at a concrete example. Suppose we have three
+functions `h`, `g`, and `f` (each take 1 input and return 1 output). Using the
+$\circ$ operator, we can write the composition of all three as $h \circ g \circ
+f$, which is the same as $h \circ (g \circ f)$. This has the structure of a
+right fold. 
+
+Recall that right fold has the form `(foldr op init lst)`. What would be `init`
+for composition? The answer is the **identity function**, which is a function
+that returns whatever you pass it, i.e. $I(x) = x$. For example, $f \circ I =
+f$, e.g. $(f \circ I)(x) = f(I(x)) = f(x)$.
+
+Now we can write `compose-all` as a right fold:
 
 ```lisp
-;; (compose-all f1 f2 ... fn) 
-;; returns (f1 (f2 ... (fn x) ...))
 (define (compose-all . fns)
-  (cond [(empty? fns) 
-           (error "compose-all: empty args")]
-        [(empty? (rest fns)) 
-           (first fns)]
-        [else 
-           (comp (first fns) 
-                 (apply compose-all (rest fns)))]))
+  (foldr comp
+         (lambda (x) x)   ; identity function
+         fns))
 ```
 
-Calling `(compose-all)` without any arguments is considered an error, and
-`(compose-all f)` is the same as `f`. If two or more functions are given, then
-all but the first function are recursively composed, and then the first function
-is composed onto that.
+Here's an example of how this works:
 
-We have to use `apply` when calling `compose-all`. Writing `(compose-all (rest
-fns))` doesn't work because `(rest fns)` is a list of functions, e.g. it would
-end up calling something like `(compose-all (list f2 f3))`, which is incorrect.
+```lisp
+(define (f x) (append x (list 'f)))
+(define (g x) (append x (list 'g)))
+(define (h x) (append x (list 'h)))
 
-Here's an example of how `compose-all` can be useful:
+(define fgh (compose-all f g h))
+
+> (seq1 '(test))
+`(test h g f)
+```
+
+This shows that the functions are applied in *reverse* order, which most humans
+find counter-intuitive. So lets write a variation of `compose-all` that applies
+the functions in the order they are given:
+
+``lisp
+(define (pipeline . fns)
+  (apply compose-all (reverse fns)))
+```
+
+This lets us write the functions in the order they're applied:
+
+```lisp
+(define seq2 (pipeline f g h))
+
+> (seq2 '(test))
+'(test f g h)
+```
+
+Pipelines of function can be quite useful in practice. For example:
 
 ```lisp
 ;; helper functions
@@ -464,43 +406,13 @@ Here's an example of how `compose-all` can be useful:
 (define (keep-positives lst) (filter (lambda (x) (> x 0))
                                      lst))
 
-;; for compose-all, the listed functions are applied 
-;; in reverse order, i.e. the last thing f1 does is 
-;; remove duplicates
+;; functions are applied in the order they are given
+(define seq (pipeline
+             keep-positives
+             sort-increasing
+             remove-duplicates))
 
-(define f1 (compose-all
-            remove-duplicates
-            sort-increasing
-            keep-positives))
-
-> (f1 '(1 8 8 7 2 2 1 -2 -3))
-'(1 2 7 8)
-```
-
-`compose-all` applies the functions in *reverse* order. Some programmers find
-that unnatural, and so prefer this variation:
-
-```lisp
-;; Same as compose-all, except functions are applied in
-;; reverse of order they are given, i.e.
-;; (pipeline f1 f2 ... fn) returns 
-;; (fn (... (f2 (f1 x)) ...))
-(define (pipeline .  fns)
-  (apply compose-all (reverse fns)))
-```
-
-Now we can write the functions in the order they're applied:
-
-```lisp
-;; for pipeline, the listed functions are applied in the
-;; order they are given, i.e. the first thing f2 does is
-;; filter out non-positive values
-(define f2 (pipeline
-            keep-positives
-            sort-increasing
-            remove-duplicates))
-
-> (f2 '(1 8 8 7 2 2 1 -2 -3))
+> (seq '(1 8 8 7 2 2 1 -2 -3))
 '(1 2 7 8)
 ```
 
@@ -768,6 +680,116 @@ if you're curious.
 > `X`! Again, check out [the Wikipedia page on combinatory
 > logic](https://en.wikipedia.org/wiki/Combinatory_logic#One-point_basis) if you
 > are curious about the details.
+
+
+# Optional: The Scope of Names: Static Scoping vs Dynamic Scoping
+
+The **scope** of a name is where it is visible. A **local variable** is a
+variable whose scope is restricted to the block of code where it was declared. A
+**nonlocal variable** is visible outside of the block in which it was declared.
+**Global variables** are nonlocal variables that can be used anywhere in a
+program.
+
+Most modern languages, including [Racket], are **statically scoped** (or
+**lexically scoped**). This means that a variable's scope can be determined
+*before* the program runs just by examining the source code. Static scoping
+helps programmers to read source code and determine what values names are bound
+to without the need to run the code.
+
+Consider this [Racket] code:
+
+```lisp
+(define x 1)
+(define f (lambda (x) (g 2)))
+(define g (lambda (y) (+ x y)))  ;; Which x does this refer to?
+```
+
+[Racket] is statically scoped, and so if you evaluate `(f 5)` the answer is 3
+(because the `x` in `g` refers to the `x` whose value is 1). If [Racket] were
+instead dynamically scoped, i.e. if the most recently encountered variable named
+`x` was used in `g`, then the answer would be 7.
+
+It is useful to trace this in some detail. Before `(f 5)` is called, `x` was
+bound to 1 by the first `define`. When `(f 5)` is called, the 5 is bound to
+`x` in the lambda expression for `f`. Then `(g 2)` is called, and the 2 is
+bound `y` in the lambda expression for `g`. So at this point, there are three
+bound variables: `x` bound to 1, `x` bound to 5, and `y` bound to 2. In `g`s
+body expression `(+ x y)`, what value should be used for `x`? Should it be 1,
+or should it be 2? [Racket] is statically scoped, and so it decides on
+bindings *before* the code runs, which means it must use the `x` bound to 1.
+However, in a **dynamically scoped** language, the most recently bound value
+of `x` is used. If [Racket] were dynamically scoped, then `(f 5)` would print
+7.
+
+Here's a  [JavaScript] example of static scoping:
+
+```javascript
+function big() {
+    function sub1() {
+        var x = 7;   // hides the x defined in big
+        sub2();
+    }
+
+    function sub2() {
+        var y = x;      // which x does this refer to?
+    }
+    var x = 3;
+    sub1();
+}
+```
+
+[JavaScript] is statically scoped, and so the `x` in `sub2` is the `x` with the
+value 3 that is defined in `big`. If [JavaScript] were dynamically scoped, then
+`x` would refer to the most recently bound `x` at runtime, i.e. the `x` bound to
+7.
+
+Dynamic scoping is an alternative to static scoping that has largely fallen out
+of favor. Most examples of dynamic scoping occur in older languages, such as
+[APL](https://en.wikipedia.org/wiki/APL_(programming_language)),
+[SNOBOL](https://en.wikipedia.org/wiki/SNOBOL), and early versions of [LISP].
+Some languages, such as [Perl], let you optionally declare variables that follow
+dynamic scoping rules.
+
+The idea of dynamic scoping is that the meaning of a variable depends upon the
+value of the most recent variable with the same name in the current function
+call stack (as opposed to the enclosing block of source code).
+
+Here is one more example showing the difference between static and dynamic
+scoping using a C++-like language:
+
+```cpp
+const int b = 5;    
+
+int foo()
+{
+   int a = b + 5;  // What is b?
+   return a;
+}
+ 
+int bar()
+{
+   int b = 2;
+   return foo();
+}
+ 
+int main()
+{
+   foo(); // returns 10 for static scoping; 10 for dynamic scoping
+   bar(); // returns 10 for static scoping; 7 for dynamic scoping
+}
+```
+
+In general, dynamic scoping makes it harder to reason about the meaning of
+programs from their source code alone. Under dynamic scoping, you can't always
+tell for sure what a variable refers to until the code runs, because the order
+in which functions are called matters.
+
+Another problem with dynamic scoping is that it exposes the local variables of a
+function to other functions, thus allowing the possibility that they could be
+modified. This breaks function encapsulation.
+
+On the plus side, dynamic scoping is easier to implement than static scoping.
+
 
 [Scheme]: https://en.wikipedia.org/wiki/Scheme_(programming_language)
 [Racket]: https://racket-lang.org/

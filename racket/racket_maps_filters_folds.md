@@ -418,7 +418,7 @@ The function `deep-count` was written in previous notes:
 This implementation is straightforward. Its body is a `cond` that handles all
 the possible cases of items on a list (plus the special case of the empty list).
 
-A more functional way to implement this is to use `foldr` and `map`. The idea is
+A more functional way to implement this is with `foldr` and `map`. The idea is
 to replace each item on the list with how many numbers it contains. There are
 three kinds of items:
 
@@ -460,7 +460,8 @@ Here's the code:
         lst)))
 ```
 
-Here's a similar implementation using a helper function:
+Here's a similar implementation using a helper function that shows the essential
+idea more clearly:
 
 ```lisp
 (define (bool->int b) (if b 1 0))
