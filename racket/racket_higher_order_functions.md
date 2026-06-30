@@ -694,7 +694,7 @@ K)` is the identity function.
 ### Completeness of S and K
 
 Most programmers quite naturally wonder about the purpose of small functions
-like `S` and `K`. Why bother? THey don't seem very useful.
+like `S` and `K`. Why bother? They don't seem very useful.
 
 Surprisingly, functions `S` and `K` can be combined to define *any* other pure
 function. You could think of `S` and `K`  like a low-level assembly language for
