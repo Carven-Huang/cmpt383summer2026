@@ -228,7 +228,7 @@ f(g(x)) &= g(x)^2 \\
 \end{align*}
 $$
 
-This is denoted $f \circ g$, i.e. $\circ$ is the function composition operator:
+$\circ$ is the function composition operator:
 
 $$
 \begin{align*}
@@ -313,12 +313,14 @@ We can generalize `comp` as follows:
 (define triple-cherry 
    (compose-n (lambda (lst) (cons 'cherry lst)) 3))
 
+> (triple-cherry '(vanilla))
+'(cherry cherry cherry vanilla)
+
+
 (define (inc n) (+ n 1))
 
 > ((compose-n inc 5) 1)    
 6
-> (triple-cherry '(vanilla))
-'(cherry cherry cherry vanilla)
 ```
 
 `compose-n` returns a new function that we could refer to as "`f` to the power
@@ -402,6 +404,7 @@ Pipelines of function can be quite useful in practice. For example:
 ```lisp
 ;; helper functions
 
+;; sort is a built-in function
 (define (sort-increasing lst) (sort lst <=))
 (define (keep-positives lst) (filter (lambda (x) (> x 0))
                                      lst))
@@ -567,23 +570,23 @@ The function `(M x)` takes a function `x` as input, and calls `x` on itself:
 ```lisp
 (define (M x) (x x))
 
-> (M list)
+> (M list)       ;;  (list list)
 '(#<procedure:list>)
-> (M symbol?)
+> (M symbol?)    ;;  (symbol? symbol?)
 #f
-> (M I)
+> (M I)          ;;  (I I)
 #<procedure:I>
-> (M 4)
+> (M 4)          ;;  (4 4)
 . . application: not a procedure;
  expected a procedure that can be applied to arguments
   given: 4
   arguments...:
 ```
 
-The expression `(M M)` is interesting: it is an infinite loop that never returns
-a value. When you call `(M M)`, the argument `M` replaces `x` in the body of
-function `M`, i.e. `(x x)` becomes `(M M)`. This evaluates to `(M M)`, and the
-same thing happens again and again forever.
+The expression `(M M)` is interesting: it is an *infinite loop* that never
+returns a value. When you call `(M M)`, the argument `M` replaces `x` in the
+body of function `M`, i.e. `(x x)` becomes `(M M)`. This evaluates to `(M M)`,
+and the same thing happens again and again forever.
 
 We could write `M` as a lambda function:
 
@@ -610,6 +613,12 @@ that always returns `x`:
 
 ```lisp
 (define (K x) (lambda (y) x))
+
+> ((K 'pizza) 'ignored)
+'pizza
+
+> (map (K 5) '(a b c d))
+'(5 5 5 5)
 ```
 
 ### The S Combinator
@@ -621,15 +630,41 @@ Function `S3` takes 3 inputs:
   ((x z) (y z)))
 ```
 
+This is pretty weird! `x` and `y` are functions, and `z` is an argument to both.
+`x` must also return a function that can be applied to the output of `y`. Here
+is an example of calling it:
+
+```lisp
+;; helper functions
+(define (make-add a) (lambda (n) (+ n a)))
+(define (times2 n) (* 2 n))
+
+> (S3 make-add times2 3)
+9
+```
+
+The call to `S3` is evaluated like this:
+
+- `(S3 make-add times2 3)`
+- `((make-add 3) (times2 3))`
+- `((make-add 3) 6)`
+- `((lambda (n) (+ n 3)) 6)`
+- `(+ 6 3)`
+- `9`
+
+Intuitively, `S3` can be thought of as a generalization of function composition.
+`(S3 x y z)` composes `x` and `y` --- but first it calls `x` on `z` and `y` on
+`z` (and composes the results).
+
 `S` is a curried version of `S3`. You can pass 0, 1, 2, or 3 arguments to `S`
 (you must always pass exactly 3 arguments to `S3`):
 
 ```lisp
-(define S (curry S3))
+(define S (curry S3)) ;; curry is a built-in function
 ```
 
-Intuitively, you can think of `S` as a generalization of regular function
-calling: `S` calls `x` on `y`, but *first* it calls `x` on `z` and `y` on `z`.
+This lets us pass 0, 1, 2, or 3 arguments to `S`, which is useful for combining
+combinators.
 
 ### I in Terms of S and K
 
@@ -637,50 +672,38 @@ Interestingly, the identity function `I` can be defined in terms of `S` and `K`
 like this:
 
 ```lisp
-(define (I x) ((S K K) x))
+(define (I a) ((S K K) a))
+
+> (I 4)
+4
+> (I '(a b c))
+'(a b c)
+> (I I)
+#<procedure:I>
 ```
 
-To see why this is true, consider `(S K K)`. This calls `S` with two arguments,
-`K` and `K`, and is equivalent to this function:
+To see why this is true, let's evaluate `((S K K) 'a)`.  Since `S` is curried,
+`(S K K)` is a evaluates to a function that takes one argument, which in this
+case is `'a`. Thus `((S K K) 'a)` evaluates to the same thing as `(S3 K K 'a)`.
 
-```lisp
-(lambda (z) ((K z) (K z)))
-```
-
-`(K z)` is a function that takes one input, and no matter what that input is the
-return value will be `z`. So `((K z) (K z))` evaluates to `z`, and we can
-re-write the lambda function for `(S K K)` as:
-
-```lisp
-(lambda (z) z)
-```
-
-This is the identity function: it returns unchanged whatever you pass it.
-
+Following the definition of `S3`, `(S3 K K 'a)` evaluates to `((K 'a) (K 'a))`.
+`(K 'a)` returns a function that always returns `'a` so `((K 'a) (K 'a))`
+evaluates to `'a`. And so `((S K K) 'a)` evaluates to `'a`, which means `(S K
+K)` is the identity function.
 
 ### Completeness of S and K
 
-Surprisingly, functions `S` and `K` can be combined to define *any* other pure
-function. Of course, the function might not be efficient or readable, but it can
-be done.
+Most programmers quite naturally wonder about the purpose of small functions
+like `S` and `K`. Why bother? THey don't seem very useful.
 
-We won't go through the proof here, but check out [the Wikipedia page on
+Surprisingly, functions `S` and `K` can be combined to define *any* other pure
+function. `S` and `K` are like a low-level assembly language for pure functions.
+Of course, the function might not be efficient or readable, but it can be done.
+
+We won't cover the proof here, but check out [the Wikipedia page on
 combinatory
 logic](https://en.wikipedia.org/wiki/Combinatory_logic#Completeness_of_the_S-K_basis)
 if you're curious.
-
-> It turns out there is a single function, called `X`, that can implement both
-> `S` and `K`:
-> 
->  ```lisp
->  (define (X x) ((x S) K))
->  ```
->  
-> Thus, *all* pure functions can be implemented in terms of the single function
-> `X`! Again, check out [the Wikipedia page on combinatory
-> logic](https://en.wikipedia.org/wiki/Combinatory_logic#One-point_basis) if you
-> are curious about the details.
-
 
 # Optional: The Scope of Names: Static Scoping vs Dynamic Scoping
 
