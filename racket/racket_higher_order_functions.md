@@ -697,8 +697,9 @@ Most programmers quite naturally wonder about the purpose of small functions
 like `S` and `K`. Why bother? THey don't seem very useful.
 
 Surprisingly, functions `S` and `K` can be combined to define *any* other pure
-function. `S` and `K` are like a low-level assembly language for pure functions.
-Of course, the function might not be efficient or readable, but it can be done.
+function. You could think of `S` and `K`  like a low-level assembly language for
+pure functions, or as the atoms of computation. Of course, the function might
+not be efficient or readable, but it can be done.
 
 We won't cover the proof here, but check out [the Wikipedia page on
 combinatory
