@@ -9,5 +9,5 @@
   - [Go problem set](go/Go_problemset.md)
 - [Racket notes](racket/README.md)
   - [Racket problem set](racket/Racket_problemset.md)
-- Haskell notes
+- [Haskell notes](haskell/README.md)
 - Prolog notes
